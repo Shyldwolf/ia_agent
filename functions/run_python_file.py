@@ -1,5 +1,30 @@
 import os
 import subprocess
+from google.genai import types
+
+schema_run_python_file = types.FunctionDeclaration(
+    name="run_python_file",
+    description=(
+        "Executes a Python file located within the working directory and returns "
+        "its standard output and standard error"
+    ),
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="Path to the Python file to execute, relative to the working directory",
+            ),
+            "args": types.Schema(
+                type=types.Type.ARRAY,
+                items=types.Schema(type=types.Type.STRING),
+                description="Optional list of arguments to pass to the Python script",
+            ),
+        },
+        required=["file_path"],
+    ),
+)
+
 
 def run_python_file(working_directory, file_path, args=None):
     
@@ -34,7 +59,7 @@ def run_python_file(working_directory, file_path, args=None):
         
         
         if result.returncode != 0:
-            output_parts.append(f"Process exited with code X {result.returncode}")
+            output_parts.append(f"Process exited with code: {result.returncode}")
 
         if not result.stdout.strip() and not result.stderr.strip():
             output_parts.append("No output produced.")
